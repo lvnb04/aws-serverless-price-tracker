@@ -47,7 +47,7 @@ The entire application is built on a "two-flow" serverless, event-driven model:
 1.  **Flow 1 (The "Ingestion" API):** A real-time, user-facing flow for adding new products.
 2.  **Flow 2 (The "Scheduled Worker"):** An automated, backend flow for checking prices and sending alerts.
 
-### Cost & Scalability (AWS Free Tier)
+### 1. Cost & Scalability (AWS Free Tier)
 
 This architecture is designed to be **extremely cost-effective**. For the vast majority of personal projects, this application can be run entirely within the **AWS Free Tier**.
 
@@ -60,14 +60,14 @@ This architecture is designed to be **extremely cost-effective**. For the vast m
 
 This means you can run a powerful, scalable application that checks thousands of products per day for virtually **$0.00**.
 
-### Modular & Extensible Design (Open-Closed Principle)
+### 2. Modular & Extensible Design (Open-Closed Principle)
 
 This project follows the **Open-Closed Principle** ("open for extension, but closed for modification"). The core logic is decoupled from its specific tools, making it highly maintainable and adaptable.
 
 * **Swappable Scraper:** The `scrapePrice` Lambda's job is *orchestration*, not scraping. It calls an external scraper API. If I want to switch from `ScraperAPI` to `BrightData` (or even a self-hosted `Selenium` grid), I only need to modify the internal `scrape_product` helper function. The main Lambda handler and all its surrounding logic (DynamoDB scans, alert routing) remain **unchanged**.
 * **Swappable Notifications:** The alert logic is a simple router. If I want to add `Twilio (SMS)` or `Slack` notifications, I simply add a new `elif notification_type == 'SMS':` block and a `send_sms_alert()` function. The existing, working Email and Telegram code is **never modified**, eliminating the risk of regression.
 
-### Why This Design? (Service-by-Service Breakdown)
+### 3. Why This Design? (Service-by-Service Breakdown)
 
 * **Why AWS CDK?**
     Infrastructure as Code (IaC) is the modern standard for cloud deployment. Instead of manually clicking in the AWS console (which is error-prone and not repeatable), I chose to define the entire stack in Python. This allows for 100% reproducible deployments, version control (via Git), and automated CI/CD pipelines. The CDK "synthesizes" this Python code into a robust AWS CloudFormation template.
