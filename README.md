@@ -89,7 +89,7 @@ This project was built adhering to key SOLID principles, making the architecture
     High-level modules do not depend on low-level modules; both depend on abstractions.
     * **High-Level Module:** The main `lambda_handler` in `scrapePrice.py`, which contains the core business logic (scan, loop, check, alert).
     * **Low-Level Module:** The `boto3` client for SES or the `requests` call to the Telegram API.
-    * **Abstraction:** My helper functions (`send_email_alert()`, `send_telegram_alert()`).
+    * **Abstraction:** The helper functions (`send_email_alert()`, `send_telegram_alert()`).
     The `lambda_handler` only depends on the `send_email_alert()` abstraction, not on the `boto3` implementation. This allows me to completely change *how* emails are sent (e.g., switch to SendGrid) just by modifying the helper function, without touching the main business logic.
 
 ### 3. ⚙️ Why This Design? (Service-by-Service Breakdown)
@@ -109,12 +109,12 @@ This project was built adhering to key SOLID principles, making the architecture
 * **Why EventBridge?**
     I needed a reliable, serverless "cron job" to trigger my `scrapePrice` Lambda. **EventBridge** is the "central nervous system" for AWS Event-Driven Architectures (EDAs) and is the native solution for scheduled events.
 
-* **Why a 3rd Party Scraper API? (The Most Important Decision)**
+* **Why a 3rd Party Scraper API?**
     Scraping sites like Amazon directly from an AWS Lambda is nearly impossible and destined to fail.
     1.  **IP Blocking:** Amazon instantly blocks requests from AWS datacenter IP addresses.
     2.  **CAPTCHAs & JS Rendering:** Amazon uses JavaScript to load prices and serves CAPTCHAs to block bots. `BeautifulSoup` (bs4) can't run JavaScript, and `Selenium` (a full browser) is too large and slow for a Lambda package.
     3.  **Maintenance Nightmare:** Amazon changes its HTML layout and CSS selectors *weekly* to break scrapers.
-    I solved this by outsourcing the most fragile part of the app to a service (like ScraperAPI) whose *entire job* is to manage these problems. My Lambda's job is simply **orchestration**, not scraping.
+    I solved this by outsourcing the most fragile part of the app to a service (like ScraperAPI) whose *entire job* is to manage these problems. My Lambda's job now is **orchestration**, not scraping.
 
 * **Why Secrets Manager & SES?**
     **Secrets Manager** allows me to securely store and inject my API keys and bot tokens at runtime, keeping them out of my source code. **SES** is a powerful, managed service that allows me to send thousands of emails for pennies, with high deliverability (i.e., not going to spam).
