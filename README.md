@@ -15,6 +15,19 @@ CloudTrack is a full-stack, serverless application that automatically monitors e
 
 ---
 
+## ✨ Key Features
+
+* 🎯 **Dynamic Tracking Services:** Users can select one of three tracking modes:
+    *  **Price Tracking:** Get an alert when a product's price drops below a set target.
+    *  **Stock Tracking:** Get a one-time alert when an out-of-stock item becomes available.
+    *  **Both:** Get a combined alert for either event.
+* 📬 **Multi-Channel Notifications:** Receive instant confirmation and alert messages via **Amazon SES (Email)** or **Telegram**.
+* 🤖 **Smart Validation Logic:** The application is stateless but smart. The API scrapes product data *on ingestion* and will return a `400 Bad Request` error if a user tries to track the stock for an item that is already *in stock*, preventing a bad request from ever entering the database.
+* ⚙️ **Fully Automated & Serverless:** A "set it and forget it" system. An **AWS EventBridge** schedule runs the scraper daily with no manual intervention. The entire application is 100% serverless, meaning it costs virtually nothing when not in use.
+* 🚀 **Infrastructure as Code (IaC):** The *entire* application stack—from the S3 frontend to the API, Lambdas, and database—is defined in a single Python file using the **AWS CDK**. This allows for reliable, repeatable, and automated deployments.
+
+---
+
 ### 📸 Application Snapshots
 
 1. **Successful API Call (Frontend UI)**
@@ -32,18 +45,6 @@ CloudTrack is a full-stack, serverless application that automatically monitors e
 4. **Price Drop Alert**
 <img src="https://github.com/user-attachments/assets/52bf42c9-3f92-4679-9d4b-bfdf730d9518" width="500" alt="Price Drop Alert">
 
----
-
-## ✨ Key Features
-
-* 🎯 **Dynamic Tracking Services:** Users can select one of three tracking modes:
-    1.  **Price Tracking:** Get an alert when a product's price drops below a set target.
-    2.  **Stock Tracking:** Get a one-time alert when an out-of-stock item becomes available.
-    3.  **Both:** Get a combined alert for either event.
-* 📬 **Multi-Channel Notifications:** Receive instant confirmation and alert messages via **Amazon SES (Email)** or **Telegram**.
-* 🤖 **Smart Validation Logic:** The application is stateless but smart. The API scrapes product data *on ingestion* and will return a `400 Bad Request` error if a user tries to track the stock for an item that is already *in stock*, preventing a bad request from ever entering the database.
-* ⚙️ **Fully Automated & Serverless:** A "set it and forget it" system. An **AWS EventBridge** schedule runs the scraper daily with no manual intervention. The entire application is 100% serverless, meaning it costs virtually nothing when not in use.
-* 🚀 **Infrastructure as Code (IaC):** The *entire* application stack—from the S3 frontend to the API, Lambdas, and database—is defined in a single Python file using the **AWS CDK**. This allows for reliable, repeatable, and automated deployments.
 
 ---
 
@@ -155,12 +156,12 @@ Here is the JSON for the custom IAM policy statement that the CDK attaches to bo
 
 ```bash
 .
-├── assets/                    # Holds all our application code
+├── assets/                    # Holds all the application code
 │   ├── frontend/              # Vanilla JS frontend website
-│   │   ├── index.html       # The main HTML page
-│   │   ├── script.js        # Frontend logic and API calls
-│   │   └── style.css        # All styling
-│   └── lambda/                # Python code for our Lambda functions
+│   │   ├── index.html         # The main HTML page
+│   │   ├── script.js          # Frontend logic and API calls
+│   │   └── style.css          # All styling
+│   └── lambda/                # Python code for Lambda functions
 │       ├── addProduct.py      # Lambda for the "Add Product" flow
 │       └── scrapePrice.py     # Lambda for the "Price Check" flow
 ├── cdk_price_tracker/         # The CDK app's Python module
@@ -261,7 +262,7 @@ This project has a strong foundation for more features:
 
 * **User Authentication:** Use **AWS Cognito** to add user sign-up and login. This would involve updating the API Gateway to use a Cognito Authorizer and adding a `UserID` as a primary or sort key in DynamoDB to secure user data.
 * **Price History Dashboard:** Modify the `scrapePrice` Lambda to *append* the new price to a list in DynamoDB instead of just overwriting it. A new `GET /products/{id}` API route could fetch this history, which a frontend (using Chart.js) could then display as a graph.
-* **ML Price Prediction:** Once price history is being collected, this time-series data could be fed into **Amazon SageMaker**. A simple model (like ARIMA or Prophet) could be trained and exposed via a new Lambda function to predict if a price is likely to drop further.
+* **ML Price Prediction:** Once price history is being collected, this time-series data could be fed into **Amazon SageMaker**. A time series model (like ARIMA or Prophet) could be trained and exposed via a new Lambda function to predict if a price is likely to drop further.
 * **CI/CD Pipeline:** Create a **GitHub Actions** workflow (`.github/workflows/deploy.yml`) that automatically lints, tests, and runs `cdk deploy --require-approval never` on every push to the `main` branch, creating a fully automated deployment pipeline.
 
 ---
